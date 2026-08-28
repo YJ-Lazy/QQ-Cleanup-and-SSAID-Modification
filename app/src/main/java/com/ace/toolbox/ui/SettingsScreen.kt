@@ -12,6 +12,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ace.toolbox.data.AppConfig
+import com.ace.toolbox.data.SsaidGenerator
 import com.ace.toolbox.ui.components.MiuiRow
 import com.ace.toolbox.ui.components.MiuiSection
 
@@ -58,6 +59,16 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
             )
             HorizontalDivider(Modifier.padding(start = 58.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = .45f))
             MiuiRow(Icons.Rounded.Edit, "SSAID 值", if (ssaidValue.isBlank()) "未配置" else ssaidValue, onClick = { showSsaid = true })
+            HorizontalDivider(Modifier.padding(start = 58.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = .45f))
+            MiuiRow(
+                Icons.Rounded.Casino,
+                "随机生成 SSAID",
+                "使用 SecureRandom 生成新的 16 位十六进制 ID",
+                onClick = {
+                    ssaidValue = SsaidGenerator.randomHex16()
+                    config.ssaidValue = ssaidValue
+                }
+            )
         }
 
         MiuiSection("兼容规则") {
@@ -67,7 +78,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
         }
 
         MiuiSection("关于") {
-            MiuiRow(Icons.Rounded.Extension, "ACE 工具箱 0.1.4", "Modern LSPosed API 102 · minSdk 26")
+            MiuiRow(Icons.Rounded.Extension, "ACE 工具箱 0.1.5", "Modern LSPosed API 102 · minSdk 26")
             MiuiRow(Icons.Rounded.Code, "参考", "FunBox 的模块组织/交互思路；SSAID 功能参考 YJ-Lazy/ssaid-qq（MIT）")
         }
     }
@@ -76,15 +87,28 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
         onDismissRequest = { showSsaid = false },
         title = { Text("设置 QQ SSAID") },
         text = {
-            OutlinedTextField(
-                ssaidValue,
-                { ssaidValue = it.filter { ch -> ch.isDigit() || ch.lowercaseChar() in 'a'..'f' }.take(16) },
-                label = { Text("16 位十六进制") },
-                supportingText = { Text("示例：0123456789abcdef。错误格式时 Hook 会自动回退系统值。保存后请重启 QQ。") }
-            )
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                OutlinedTextField(
+                    ssaidValue,
+                    { ssaidValue = it.filter { ch -> ch.isDigit() || ch.lowercaseChar() in 'a'..'f' }.take(16) },
+                    label = { Text("16 位十六进制") },
+                    supportingText = { Text("示例：0123456789abcdef。错误格式时 Hook 会自动回退系统值。保存后请重启 QQ。") }
+                )
+                OutlinedButton(
+                    onClick = { ssaidValue = SsaidGenerator.randomHex16() },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(Icons.Rounded.Casino, contentDescription = null)
+                    Spacer(Modifier.width(8.dp))
+                    Text("随机生成")
+                }
+            }
         },
         confirmButton = {
-            TextButton(onClick = { config.ssaidValue = ssaidValue; showSsaid = false }) { Text("保存") }
+            TextButton(onClick = {
+                config.ssaidValue = ssaidValue
+                showSsaid = false
+            }) { Text("保存") }
         },
         dismissButton = { TextButton(onClick = { showSsaid = false }) { Text("取消") } }
     )
