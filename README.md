@@ -1,6 +1,6 @@
 # QQ Cleanup and SSAID Modification
 
-一个面向 QQ / 微信的 Modern LSPosed 工具箱初版，当前版本 **0.1.4**。项目参考 FunBox 的模块组织、宿主注入和功能分组思路重新实现，不包含或分发 FunBox 的私有源码、资源或 native `.so`。
+一个面向 QQ / 微信的 Modern LSPosed 工具箱初版，当前版本 **0.1.5**。项目参考 FunBox 的模块组织、宿主注入和功能分组思路重新实现，不包含或分发 FunBox 的私有源码、资源或 native `.so`。
 
 ## 当前功能
 
@@ -16,6 +16,7 @@
 - 清理报告：宿主进程通过受 UID 白名单保护的 ContentProvider 回传到模块 App，可查看最近 30 条。
 - Hook 规则：内置 JSON + 按目标版本缓存 + 可配置 HTTPS 远程规则。
 - QQ SSAID：可选且默认关闭；仅在 QQ scope 内替换 `Settings.Secure.ANDROID_ID`。**关闭时不会安装 ANDROID_ID Hook**，减少与其他设备标识/隐私模块的 Hook 链交互。
+- SSAID 随机 ID：使用 `SecureRandom` 生成 8 个随机字节，并编码为 16 位小写十六进制字符串；可在 SSAID 编辑弹窗中预览后保存，也可在设置页直接生成并保存。
 - Material You + MIUI/HyperOS 风格 Compose UI：首页 / 清理 / 报告 / 设置。
 - ACE 自适应图标。
 
@@ -51,7 +52,7 @@
 
 当前项目保留了对应来源说明，并在 `third_party/ssaid-qq-LICENSE.txt` 中附带上游 MIT License 全文。上游 `ssaid-qq` 自身的 NOTICE 还说明其基于 / 受 `YJ-Lazy/SSaidHook` 启发；本仓库在 `NOTICE.md` 中保留了这一来源链。
 
-除 SSAID 部分的上述来源外，本项目的 Cleaner、宿主设置注入、规则管理和 Compose UI 为本工程独立组织实现。
+除 SSAID 部分的上述来源外，本项目的 Cleaner、宿主设置注入、规则管理、Compose UI，以及本版本新增的 `SecureRandom` 随机 ID 生成器为本工程独立组织实现。
 
 ## API 102 元数据
 
@@ -133,7 +134,7 @@ app/build/outputs/apk/debug/app-debug.apk
 3. 强制停止 QQ / 微信并重新打开。
 4. 进入 QQ 设置或微信设置。兼容模式下右下方应出现「ACE 清理」。
 5. 点击「ACE 清理」进行扫描，确认清理项后执行安全清理。
-6. SSAID 功能默认关闭；需要时在模块 App 中单独开启并设置 16 位十六进制值，然后重启 QQ。
+6. SSAID 功能默认关闭；需要时在模块 App 中单独开启，并手动输入或点击「随机生成 SSAID」生成 16 位十六进制值，然后重启 QQ。
 
 ## 当前兼容边界
 
@@ -153,6 +154,7 @@ QQ / 微信内部设置实现经常变化。当前采用：
 - **0.1.2**：将不可用的 `Icons.Rounded.Database` 替换为 `Icons.Rounded.Storage`。
 - **0.1.3**：修复 `AlertDialog.setButton` 的 Java Lambda 参数签名。
 - **0.1.4**：默认启用冲突安全的宿主设置兼容模式；增加 Activity 生命周期入口兜底；SSAID 关闭时不再安装 `ANDROID_ID` Hook。
+- **0.1.5**：新增基于 `SecureRandom` 的 16 位随机 SSAID 生成功能，并加入设置页快捷生成和编辑弹窗预览生成入口。
 
 ## 第三方参考
 
