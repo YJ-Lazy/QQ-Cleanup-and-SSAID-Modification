@@ -42,6 +42,7 @@ final class HostHookInstaller {
             Log.e(TAG, "Unable to install Application bootstrap for " + pkg, t);
             HookRule rule = RuleRepository.loadBundled(pkg);
             if (rule != null) installSettingHooks(module, pkg, loader, rule);
+            installActivityFallback(module, pkg, loader);
         }
     }
 
@@ -51,6 +52,11 @@ final class HostHookInstaller {
 
         HookRule rule = RuleRepository.resolveCachedOrBundled(app, pkg);
         if (rule != null) installSettingHooks(module, pkg, loader, rule);
+
+        // The lifecycle fallback is deliberately independent from QQ/WeChat's internal Preference
+        // implementation. It lets the cleanup entry reappear after fragment redraws and version
+        // changes without racing another module's Preference adapter mutations.
+        installActivityFallback(module, pkg, loader);
 
         if (HostPackages.QQ.equals(pkg)) {
             SsaidFeature.install(module, app, loader);
@@ -64,7 +70,7 @@ final class HostHookInstaller {
 
     private static void installSettingHooks(XposedModule module, String pkg, ClassLoader loader, HookRule rule) {
         for (String className : rule.settingClasses) {
-            String hookKey = pkg + ":" + className;
+            String hookKey = pkg + ":settings:" + className + ":" + rule.methodName;
             if (!INSTALLED.add(hookKey)) continue;
             try {
                 Class<?> cls = Class.forName(className, false, loader);
@@ -79,9 +85,9 @@ final class HostHookInstaller {
                         .intercept(chain -> {
                             Object result = chain.proceed();
                             Object self = chain.getThisObject();
-                            if (self instanceof Activity && self.getClass().getName().equals(className)) {
+                            if (self instanceof Activity) {
                                 Activity activity = (Activity) self;
-                                activity.getWindow().getDecorView().post(() -> HostSettingInjector.inject(activity, pkg));
+                                HostSettingInjector.scheduleMaybeInject(activity, pkg);
                             }
                             return result;
                         });
@@ -91,4 +97,29 @@ final class HostHookInstaller {
             }
         }
     }
+
+    private static void installActivityFallback(XposedModule module, String pkg, ClassLoader loader) {
+        String key = pkg + ":activity-resume:" + System.identityHashCode(loader);
+        if (!INSTALLED.add(key)) return;
+        try {
+            Method onResume = Activity.class.getDeclaredMethod("onResume");
+            onResume.setAccessible(true);
+            module.hook(onResume)
+                    .setExceptionMode(XposedInterface.ExceptionMode.PROTECTIVE)
+                    .intercept(chain -> {
+                        Object result = chain.proceed();
+                        Object self = chain.getThisObject();
+                        if (self instanceof Activity) {
+                            Activity activity = (Activity) self;
+                            HostSettingInjector.scheduleMaybeInject(activity, pkg);
+                        }
+                        return result;
+                    });
+            Log.i(TAG, "Installed compatibility Activity lifecycle watcher for " + pkg);
+        } catch (Throwable t) {
+            Log.w(TAG, "Unable to install lifecycle fallback for " + pkg + ": " + t.getMessage());
+        }
+    }
+
+    private HostHookInstaller() {}
 }
