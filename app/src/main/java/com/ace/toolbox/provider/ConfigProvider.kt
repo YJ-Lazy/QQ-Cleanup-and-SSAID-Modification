@@ -36,16 +36,33 @@ class ConfigProvider : ContentProvider() {
         }
     }
 
-    override fun query(uri: Uri, projection: Array<out String>?, selection: String?, selectionArgs: Array<out String>?, sortOrder: String?): Cursor {
+    override fun query(
+        uri: Uri,
+        projection: Array<out String>?,
+        selection: String?,
+        selectionArgs: Array<out String>?,
+        sortOrder: String?
+    ): Cursor {
         enforceAllowedCaller()
         return when (matcher.match(uri)) {
-            CONFIG -> MatrixCursor(arrayOf("clean_enabled", "rule_base_url", "ssaid_enabled", "ssaid_value")).apply {
-                addRow(arrayOf(
-                    if (prefs.getBoolean("clean_enabled", true)) 1 else 0,
-                    prefs.getString("rule_base_url", "") ?: "",
-                    if (prefs.getBoolean("ssaid_enabled", false)) 1 else 0,
-                    prefs.getString("ssaid_value", "") ?: ""
-                ))
+            CONFIG -> MatrixCursor(
+                arrayOf(
+                    "clean_enabled",
+                    "compat_mode",
+                    "rule_base_url",
+                    "ssaid_enabled",
+                    "ssaid_value"
+                )
+            ).apply {
+                addRow(
+                    arrayOf(
+                        if (prefs.getBoolean("clean_enabled", true)) 1 else 0,
+                        if (prefs.getBoolean("compat_mode", true)) 1 else 0,
+                        prefs.getString("rule_base_url", "") ?: "",
+                        if (prefs.getBoolean("ssaid_enabled", false)) 1 else 0,
+                        prefs.getString("ssaid_value", "") ?: ""
+                    )
+                )
             }
             REPORTS -> reportCursor()
             else -> throw IllegalArgumentException("Unknown uri: $uri")
@@ -73,7 +90,17 @@ class ConfigProvider : ContentProvider() {
         return Uri.withAppendedPath(Uri.parse("content://$AUTHORITY/reports"), ts.toString())
     }
 
-    private fun reportCursor(): Cursor = MatrixCursor(arrayOf("package_name", "host_version", "timestamp", "before_bytes", "after_bytes", "deleted_files", "freed_bytes")).apply {
+    private fun reportCursor(): Cursor = MatrixCursor(
+        arrayOf(
+            "package_name",
+            "host_version",
+            "timestamp",
+            "before_bytes",
+            "after_bytes",
+            "deleted_files",
+            "freed_bytes"
+        )
+    ).apply {
         reports.getString("items", "")?.lines()?.filter { it.isNotBlank() }?.forEach { line ->
             val p = line.split('|')
             if (p.size == 7) addRow(p.toTypedArray())
