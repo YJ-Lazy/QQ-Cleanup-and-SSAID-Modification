@@ -1,0 +1,60 @@
+package com.ace.toolbox.ui
+
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import com.ace.toolbox.data.AppConfig
+import com.ace.toolbox.ui.components.MiuiRow
+import com.ace.toolbox.ui.components.MiuiSection
+
+@Composable
+fun SettingsScreen(modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+    val config = remember { AppConfig(context) }
+    var clean by remember { mutableStateOf(config.cleanEnabled) }
+    var ssaid by remember { mutableStateOf(config.ssaidEnabled) }
+    var ssaidValue by remember { mutableStateOf(config.ssaidValue) }
+    var ruleUrl by remember { mutableStateOf(config.ruleBaseUrl) }
+    var showSsaid by remember { mutableStateOf(false) }
+    var showRule by remember { mutableStateOf(false) }
+
+    Column(modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(top = 20.dp, bottom = 22.dp)) {
+        Column(Modifier.padding(horizontal = 26.dp, vertical = 12.dp)) {
+            Text("设置", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
+            Text("MIUI / HyperOS 风格分组", color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        MiuiSection("清理") {
+            MiuiRow(Icons.Rounded.CleaningServices, "安全清理入口", "在 QQ / 微信设置页注入 ACE 工具箱", { Switch(clean, { clean = it; config.cleanEnabled = it }) })
+        }
+        MiuiSection("QQ 功能") {
+            MiuiRow(Icons.Rounded.Fingerprint, "SSAID", if (ssaid) "已开启，仅作用于 QQ 进程" else "默认关闭", { Switch(ssaid, { ssaid = it; config.ssaidEnabled = it }) })
+            HorizontalDivider(Modifier.padding(start = 58.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(alpha=.45f))
+            MiuiRow(Icons.Rounded.Edit, "SSAID 值", if (ssaidValue.isBlank()) "未配置" else ssaidValue, onClick = { showSsaid = true })
+        }
+        MiuiSection("兼容规则") {
+            MiuiRow(Icons.Rounded.CloudDownload, "在线规则源", if (ruleUrl.isBlank()) "未配置，仅使用内置规则" else ruleUrl, onClick = { showRule = true })
+            HorizontalDivider(Modifier.padding(start = 58.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(alpha=.45f))
+            MiuiRow(Icons.Rounded.Info, "规则格式", "{base}/qq/{version}.json 与 {base}/wechat/{version}.json")
+        }
+        MiuiSection("关于") {
+            MiuiRow(Icons.Rounded.Extension, "ACE 工具箱 0.1.3", "Modern LSPosed API 102 · minSdk 26")
+            MiuiRow(Icons.Rounded.Code, "参考", "FunBox 的模块组织/交互思路；SSAID 功能参考 YJ-Lazy/ssaid-qq（MIT）")
+        }
+    }
+
+    if (showSsaid) AlertDialog(onDismissRequest = { showSsaid = false }, title = { Text("设置 QQ SSAID") }, text = {
+        OutlinedTextField(ssaidValue, { ssaidValue = it.filter { ch -> ch.isDigit() || ch.lowercaseChar() in 'a'..'f' }.take(16) }, label = { Text("16 位十六进制") }, supportingText = { Text("示例：0123456789abcdef。错误格式时 Hook 会自动回退系统值。") })
+    }, confirmButton = { TextButton(onClick = { config.ssaidValue = ssaidValue; showSsaid = false }) { Text("保存") } }, dismissButton = { TextButton(onClick = { showSsaid = false }) { Text("取消") } })
+
+    if (showRule) AlertDialog(onDismissRequest = { showRule = false }, title = { Text("在线 Hook 规则源") }, text = {
+        OutlinedTextField(ruleUrl, { ruleUrl = it }, label = { Text("HTTPS 基础地址") }, supportingText = { Text("留空即禁用网络更新。远程规则只允许 com.tencent.* 设置类和 onCreate Hook。") })
+    }, confirmButton = { TextButton(onClick = { config.ruleBaseUrl = ruleUrl; showRule = false }) { Text("保存") } }, dismissButton = { TextButton(onClick = { showRule = false }) { Text("取消") } })
+}

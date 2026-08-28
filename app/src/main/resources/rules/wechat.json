@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "package": "com.tencent.mm",
+  "version": "*",
+  "settings": [
+    "com.tencent.mm.plugin.setting.ui.setting_new.MainSettingsUI"
+  ],
+  "method": "onCreate"
+}

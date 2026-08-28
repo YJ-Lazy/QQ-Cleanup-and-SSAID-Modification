@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "package": "com.tencent.mobileqq",
+  "version": "*",
+  "settings": [
+    "com.tencent.mobileqq.activity.QPublicFragmentActivity"
+  ],
+  "method": "onCreate"
+}
