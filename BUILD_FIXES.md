@@ -14,3 +14,12 @@
   `(dialog, which) -> ...`.
 - Replaced the invalid one-parameter lambda `v -> ...` with
   `(d, which) -> confirmClean(...)`.
+
+## 0.1.4
+
+- Added compatibility mode, enabled by default.
+- Compatibility mode no longer mutates QQ/WeChat's internal `PreferenceScreen`; it uses an isolated `Activity.addContentView()` cleanup entry instead.
+- Added an `Activity.onResume` fallback watcher with delayed page checks so the cleanup entry can return after QQ/WeChat fragment redraws.
+- Added page/class recognition fallback for settings screens.
+- SSAID now installs the `Settings.Secure.ANDROID_ID` hook only when the SSAID feature is explicitly enabled.
+- Added a Settings toggle for compatibility mode; native Preference injection remains available as an opt-in path.
