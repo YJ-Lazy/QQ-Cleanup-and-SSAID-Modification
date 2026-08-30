@@ -1,0 +1,44 @@
+name: Sync ACE v0.3.6 source
+
+on:
+  push:
+    paths:
+      - '.sync/ace-v0.3.6-source-text.zip'
+
+permissions:
+  contents: write
+
+jobs:
+  sync-source:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Expand source snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf .sync/staging
+          mkdir -p .sync/staging
+          unzip -q .sync/ace-v0.3.6-source-text.zip -d .sync/staging
+          rsync -a --delete-excluded \
+            --exclude '.git/' \
+            --exclude '.sync/' \
+            --exclude 'app/src/main/res/**/*.png' \
+            .sync/staging/ ./
+          rm -rf .sync
+          rm -f .github/workflows/sync-v036.yml
+      - name: Commit synchronized source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          if git diff --cached --quiet; then
+            echo 'No changes to commit.'
+            exit 0
+          fi
+          git commit -m 'sync: ACE v0.3.6 source'
+          git push origin HEAD:main
