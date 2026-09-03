@@ -21,3 +21,4 @@ jobs:
         with:
           name: ACE-Toolkit-debug
           path: app/build/outputs/apk/debug/*.apk
+# ACE v0.3.6 source-sync verification trigger
