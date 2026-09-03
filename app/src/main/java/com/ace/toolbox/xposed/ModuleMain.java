@@ -11,7 +11,7 @@ import io.github.libxposed.api.XposedModule;
 /**
  * Modern libxposed API 102 entry.
  *
- * v0.2.0 intentionally logs through XposedInterface.log(), not only android.util.Log,
+ * Logs through XposedInterface.log(), not only android.util.Log,
  * so the framework module log can prove whether ACE is loaded before any QQ UI hook runs.
  */
 public final class ModuleMain extends XposedModule {
@@ -20,7 +20,7 @@ public final class ModuleMain extends XposedModule {
     @Override
     public void onModuleLoaded(@NonNull ModuleLoadedParam param) {
         log(Log.INFO, TAG,
-                "ACE 0.3.6 loaded; process=" + param.getProcessName()
+                "ACE 2.0 loaded; process=" + param.getProcessName()
                         + "; api=" + getApiVersion()
                         + "; framework=" + getFrameworkName() + " " + getFrameworkVersion());
     }
@@ -36,8 +36,6 @@ public final class ModuleMain extends XposedModule {
                         + "; first=" + param.isFirstPackage()
                         + "; loader=" + param.getDefaultClassLoader());
 
-        // Install the Activity lifecycle watcher as early as possible. This does not depend on
-        // QQ's Application subclass or AppComponentFactory and is enough to discover the settings UI.
         HostHookInstaller.installEarly(this, pkg);
     }
 
