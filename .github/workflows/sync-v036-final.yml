@@ -4,7 +4,7 @@ on:
   push:
     branches: [ main ]
     paths:
-      - '.sync/v036/text02.b64'
+      - '.sync/v036/b04.b64'
 
 permissions:
   contents: write
@@ -21,7 +21,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p .sync/staging
-          cat .sync/v036/text*.b64 | base64 -d > .sync/v036/source.tar.xz
+          cat .sync/v036/b*.b64 | base64 -d > .sync/v036/source.tar.xz
           tar -xJf .sync/v036/source.tar.xz -C .sync/staging
           rsync -a --delete \
             --exclude '.git/' \
@@ -40,6 +40,7 @@ jobs:
           grep -q 'versionName = "0.3.6"' app/build.gradle.kts
           grep -q 'ACE 0.3.6 loaded' app/src/main/java/com/ace/toolbox/xposed/ModuleMain.java
           grep -q 'findFirstRecyclerViewLike' app/src/main/java/com/ace/toolbox/xposed/HostSettingInjector.java
+          grep -q '((ViewGroup) recycler).setClipToPadding(false);' app/src/main/java/com/ace/toolbox/xposed/HostSettingInjector.java
       - name: Commit synchronized source
         shell: bash
         run: |
