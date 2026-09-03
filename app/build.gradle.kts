@@ -11,8 +11,8 @@ android {
         applicationId = "com.ace.toolbox"
         minSdk = 26
         targetSdk = 35
-        versionCode = 36
-        versionName = "0.3.6"
+        versionCode = 200
+        versionName = "2.0"
 
         vectorDrawables.useSupportLibrary = true
     }
@@ -67,7 +67,7 @@ dependencies {
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.material:material-icons-extended")
 
-    // Java-like local scripting engine (BeanShell). Scripts are manual-run only in v0.2.5.
+    // Java-like local scripting engine (BeanShell).
     implementation("org.apache-extras.beanshell:bsh:2.0b6")
     debugImplementation("androidx.compose.ui:ui-tooling")
 }
