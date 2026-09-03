@@ -87,6 +87,7 @@ final class RuleRepository {
         List<String> classes = new ArrayList<>();
         for (int i = 0; i < a.length(); i++) {
             String n = a.getString(i).trim();
+            // Remote rules can name only application classes; never allow framework/system targets here.
             if (n.startsWith("com.tencent.") && n.length() < 180) classes.add(n);
         }
         if (classes.isEmpty()) throw new IllegalArgumentException("Rule has no safe setting candidates");

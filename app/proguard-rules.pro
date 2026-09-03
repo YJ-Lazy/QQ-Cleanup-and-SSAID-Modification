@@ -4,3 +4,7 @@
     public <init>();
 }
 -keep class com.ace.toolbox.provider.ConfigProvider { *; }
+
+# BeanShell runtime used by manual Java scripting.
+-keep class bsh.** { *; }
+-dontwarn bsh.**

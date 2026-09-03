@@ -20,33 +20,70 @@ import com.ace.toolbox.ui.components.MiuiSection
 fun SettingsScreen(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val config = remember { AppConfig(context) }
+
     var clean by remember { mutableStateOf(config.cleanEnabled) }
     var compatibility by remember { mutableStateOf(config.compatibilityMode) }
     var ssaid by remember { mutableStateOf(config.ssaidEnabled) }
     var ssaidValue by remember { mutableStateOf(config.ssaidValue) }
     var ruleUrl by remember { mutableStateOf(config.ruleBaseUrl) }
+
     var showSsaid by remember { mutableStateOf(false) }
     var showRule by remember { mutableStateOf(false) }
 
-    Column(modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(top = 20.dp, bottom = 22.dp)) {
+    Column(
+        modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(top = 20.dp, bottom = 22.dp)
+    ) {
         Column(Modifier.padding(horizontal = 26.dp, vertical = 12.dp)) {
-            Text("设置", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
-            Text("MIUI / HyperOS 风格分组", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(
+                "设置",
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                "模块行为与 QQ 功能设置",
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
 
         MiuiSection("清理") {
             MiuiRow(
                 Icons.Rounded.CleaningServices,
                 "安全清理入口",
-                "在 QQ / 微信设置页显示 ACE 清理入口",
-                { Switch(clean, { clean = it; config.cleanEnabled = it }) }
+                "在 QQ / 微信设置页显示 ACE 工具箱",
+                {
+                    Switch(
+                        clean,
+                        {
+                            clean = it
+                            config.cleanEnabled = it
+                        }
+                    )
+                }
             )
-            HorizontalDivider(Modifier.padding(start = 58.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = .45f))
+            HorizontalDivider(
+                Modifier.padding(start = 58.dp),
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = .45f)
+            )
             MiuiRow(
                 Icons.Rounded.Security,
                 "兼容模式",
-                if (compatibility) "已开启：不修改宿主 Preference，推荐与 FunBox 等模块共存" else "已关闭：尝试原生 Preference 注入，可能与其他模块冲突",
-                { Switch(compatibility, { compatibility = it; config.compatibilityMode = it }) }
+                if (compatibility) {
+                    "已开启：推荐与 FunBox 等模块共存"
+                } else {
+                    "已关闭：尝试原生 Preference 注入"
+                },
+                {
+                    Switch(
+                        compatibility,
+                        {
+                            compatibility = it
+                            config.compatibilityMode = it
+                        }
+                    )
+                }
             )
         }
 
@@ -54,12 +91,35 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
             MiuiRow(
                 Icons.Rounded.Fingerprint,
                 "SSAID",
-                if (ssaid) "已开启，仅作用于 QQ 进程；切换后请重启 QQ" else "默认关闭；关闭时不安装 ANDROID_ID Hook",
-                { Switch(ssaid, { ssaid = it; config.ssaidEnabled = it }) }
+                if (ssaid) {
+                    "已开启，仅作用于 QQ；修改后请重启 QQ"
+                } else {
+                    "默认关闭；关闭时不安装 ANDROID_ID Hook"
+                },
+                {
+                    Switch(
+                        ssaid,
+                        {
+                            ssaid = it
+                            config.ssaidEnabled = it
+                        }
+                    )
+                }
             )
-            HorizontalDivider(Modifier.padding(start = 58.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = .45f))
-            MiuiRow(Icons.Rounded.Edit, "SSAID 值", if (ssaidValue.isBlank()) "未配置" else ssaidValue, onClick = { showSsaid = true })
-            HorizontalDivider(Modifier.padding(start = 58.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = .45f))
+            HorizontalDivider(
+                Modifier.padding(start = 58.dp),
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = .45f)
+            )
+            MiuiRow(
+                Icons.Rounded.Edit,
+                "SSAID 值",
+                if (ssaidValue.isBlank()) "未配置" else ssaidValue,
+                onClick = { showSsaid = true }
+            )
+            HorizontalDivider(
+                Modifier.padding(start = 58.dp),
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = .45f)
+            )
             MiuiRow(
                 Icons.Rounded.Casino,
                 "随机生成 SSAID",
@@ -72,61 +132,104 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
         }
 
         MiuiSection("兼容规则") {
-            MiuiRow(Icons.Rounded.CloudDownload, "在线规则源", if (ruleUrl.isBlank()) "未配置，仅使用内置规则" else ruleUrl, onClick = { showRule = true })
-            HorizontalDivider(Modifier.padding(start = 58.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = .45f))
-            MiuiRow(Icons.Rounded.Info, "规则格式", "{base}/qq/{version}.json 与 {base}/wechat/{version}.json")
+            MiuiRow(
+                Icons.Rounded.CloudDownload,
+                "在线规则源",
+                if (ruleUrl.isBlank()) "未配置，仅使用内置规则" else ruleUrl,
+                onClick = { showRule = true }
+            )
+            HorizontalDivider(
+                Modifier.padding(start = 58.dp),
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = .45f)
+            )
+            MiuiRow(
+                Icons.Rounded.Info,
+                "规则格式",
+                "{base}/qq/{version}.json 与 {base}/wechat/{version}.json"
+            )
         }
 
         MiuiSection("关于") {
-            MiuiRow(Icons.Rounded.Extension, "ACE 工具箱 0.1.5", "Modern LSPosed API 102 · minSdk 26")
-            MiuiRow(Icons.Rounded.Code, "参考", "FunBox 的模块组织/交互思路；SSAID 功能参考 YJ-Lazy/ssaid-qq（MIT）")
+            MiuiRow(
+                Icons.Rounded.Extension,
+                "ACE 工具箱 0.3.6",
+                "Modern LSPosed API 102 · minSdk 26"
+            )
+            MiuiRow(
+                Icons.Rounded.Code,
+                "参考",
+                "FunBox：UI/交互；ssaid-qq：SSAID；QFun：QQ 清理路径与 Java 脚本架构思路"
+            )
         }
     }
 
-    if (showSsaid) AlertDialog(
-        onDismissRequest = { showSsaid = false },
-        title = { Text("设置 QQ SSAID") },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                OutlinedTextField(
-                    ssaidValue,
-                    { ssaidValue = it.filter { ch -> ch.isDigit() || ch.lowercaseChar() in 'a'..'f' }.take(16) },
-                    label = { Text("16 位十六进制") },
-                    supportingText = { Text("示例：0123456789abcdef。错误格式时 Hook 会自动回退系统值。保存后请重启 QQ。") }
-                )
-                OutlinedButton(
-                    onClick = { ssaidValue = SsaidGenerator.randomHex16() },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Icon(Icons.Rounded.Casino, contentDescription = null)
-                    Spacer(Modifier.width(8.dp))
-                    Text("随机生成")
+    if (showSsaid) {
+        AlertDialog(
+            onDismissRequest = { showSsaid = false },
+            title = { Text("设置 QQ SSAID") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    OutlinedTextField(
+                        ssaidValue,
+                        {
+                            ssaidValue = it
+                                .filter { ch ->
+                                    ch.isDigit() || ch.lowercaseChar() in 'a'..'f'
+                                }
+                                .take(16)
+                        },
+                        label = { Text("16 位十六进制") },
+                        supportingText = {
+                            Text("保存后请重启 QQ。错误格式时 Hook 自动回退系统值。")
+                        }
+                    )
+                    OutlinedButton(
+                        onClick = { ssaidValue = SsaidGenerator.randomHex16() },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(Icons.Rounded.Casino, contentDescription = null)
+                        Spacer(Modifier.width(8.dp))
+                        Text("随机生成")
+                    }
                 }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        config.ssaidValue = ssaidValue
+                        showSsaid = false
+                    }
+                ) { Text("保存") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showSsaid = false }) { Text("取消") }
             }
-        },
-        confirmButton = {
-            TextButton(onClick = {
-                config.ssaidValue = ssaidValue
-                showSsaid = false
-            }) { Text("保存") }
-        },
-        dismissButton = { TextButton(onClick = { showSsaid = false }) { Text("取消") } }
-    )
+        )
+    }
 
-    if (showRule) AlertDialog(
-        onDismissRequest = { showRule = false },
-        title = { Text("在线 Hook 规则源") },
-        text = {
-            OutlinedTextField(
-                ruleUrl,
-                { ruleUrl = it },
-                label = { Text("HTTPS 基础地址") },
-                supportingText = { Text("留空即禁用网络更新。远程规则只允许 com.tencent.* 设置类和 onCreate Hook。") }
-            )
-        },
-        confirmButton = {
-            TextButton(onClick = { config.ruleBaseUrl = ruleUrl; showRule = false }) { Text("保存") }
-        },
-        dismissButton = { TextButton(onClick = { showRule = false }) { Text("取消") } }
-    )
+    if (showRule) {
+        AlertDialog(
+            onDismissRequest = { showRule = false },
+            title = { Text("在线 Hook 规则源") },
+            text = {
+                OutlinedTextField(
+                    ruleUrl,
+                    { ruleUrl = it },
+                    label = { Text("HTTPS 基础地址") },
+                    supportingText = { Text("留空即禁用网络更新。") }
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        config.ruleBaseUrl = ruleUrl
+                        showRule = false
+                    }
+                ) { Text("保存") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showRule = false }) { Text("取消") }
+            }
+        )
+    }
 }

@@ -1,26 +1,13 @@
-# Project status
+# Build handoff status
 
-Current source version: 0.1.3
+Generated files: 62
+Required-file check: PASS
+XML parse check: PASS
+Placeholder/TODO scan: PASS
+Modern API metadata: API 102 / static scope QQ + WeChat
 
-Static checks completed:
-- Required-file layout: PASS
-- XML parse: PASS
-- Placeholder/TODO scan: PASS at initial handoff
-- Modern Xposed metadata: API 102 / static scope QQ + WeChat
+Local APK build was not executed in this environment because Android SDK and outbound Gradle/Maven access are unavailable here. The project contains JDK17/Gradle8.7 build configuration plus self-bootstrapping gradlew scripts and a GitHub Actions build workflow.
 
-Build-fix history from user-side Gradle compilation:
-- 0.1.1: resolved `androidx.annotation` version conflict by aligning to 1.8.0.
-- 0.1.2: replaced unavailable `Icons.Rounded.Database` with `Icons.Rounded.Storage`.
-- 0.1.3: fixed `AlertDialog.setButton` listener lambda signature in `HostCleanerDialog.java`.
-
-The latest project should be validated with:
-
-```bash
-./gradlew clean assembleDebug
-```
-
-or on Windows:
-
-```bat
-gradlew.bat clean assembleDebug
-```
+## v0.1.1 build fix
+- Fixed `androidx.annotation` dependency conflict reported by Gradle.
+- `androidx.annotation:annotation` is pinned to `1.8.0`, matching the strict version selected by Lifecycle 2.8.5 in this dependency graph.

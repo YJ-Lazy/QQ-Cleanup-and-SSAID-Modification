@@ -3,7 +3,8 @@
   "package": "com.tencent.mm",
   "version": "*",
   "settings": [
-    "com.tencent.mm.plugin.setting.ui.setting_new.MainSettingsUI"
+    "com.tencent.mm.plugin.setting.ui.setting_new.MainSettingsUI",
+    "com.tencent.mm.plugin.setting.ui.setting.SettingsUI"
   ],
   "method": "onCreate"
 }

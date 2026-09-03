@@ -51,7 +51,13 @@ class ConfigProvider : ContentProvider() {
                     "compat_mode",
                     "rule_base_url",
                     "ssaid_enabled",
-                    "ssaid_value"
+                    "ssaid_value",
+                    "java_script_enabled",
+                    "java_script_source",
+                    "java_script_auto_run",
+                    "java_script_receive_callback",
+                    "java_script_send_callback",
+                    "java_script_group_callback"
                 )
             ).apply {
                 addRow(
@@ -60,7 +66,13 @@ class ConfigProvider : ContentProvider() {
                         if (prefs.getBoolean("compat_mode", true)) 1 else 0,
                         prefs.getString("rule_base_url", "") ?: "",
                         if (prefs.getBoolean("ssaid_enabled", false)) 1 else 0,
-                        prefs.getString("ssaid_value", "") ?: ""
+                        prefs.getString("ssaid_value", "") ?: "",
+                        if (prefs.getBoolean("java_script_enabled", false)) 1 else 0,
+                        prefs.getString("java_script_source", "") ?: "",
+                        if (prefs.getBoolean("java_script_auto_run", false)) 1 else 0,
+                        if (prefs.getBoolean("java_script_receive_callback", false)) 1 else 0,
+                        if (prefs.getBoolean("java_script_send_callback", false)) 1 else 0,
+                        if (prefs.getBoolean("java_script_group_callback", false)) 1 else 0
                     )
                 )
             }

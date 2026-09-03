@@ -1,22 +1,29 @@
-# Notices / 第三方来源声明
+# Notices
 
 ## FunBox
 
-`FunBox_v2184.apk` 仅作为模块组织、宿主注入和 UI/交互方向的行为/架构参考。本项目不复制、打包或分发 FunBox 的私有源码、资源或 native 库。
+FunBox_v2184.apk was used only as a behavioral/architectural reference supplied by the user. This project does not redistribute FunBox code, resources, or native libraries.
 
-## QQ SSAID 功能
+## ssaid-qq
 
-本仓库中的 QQ SSAID 功能部分基于 / 改编参考以下公开项目：
+QQ SSAID feature design references the public MIT-licensed project:
+https://github.com/YJ-Lazy/ssaid-qq
+Copyright belongs to its respective authors. This project uses an independently organized implementation and keeps this notice for attribution.
 
-- Project: `YJ-Lazy/ssaid-qq`
-- URL: https://github.com/YJ-Lazy/ssaid-qq
-- License: MIT License
-- Copyright: Copyright (c) 2026 YJ-Lazy
 
-上游 `ssaid-qq` 的 NOTICE 进一步声明其基于 / 受 `YJ-Lazy/SSaidHook` 启发。因此本仓库保留该来源链，不将 SSAID 相关设计声称为完全原创。
+## QFun
 
-上游 MIT License 全文保存在：
+QQ-specific cleanup-path knowledge and the high-level Java-script/plugin architecture were
+researched from the public project:
+https://github.com/oneQAQone/QFun
 
-`third_party/ssaid-qq-LICENSE.txt`
+The repository is distributed under GNU GPL v3. ACE does not copy QFun source files; the
+corresponding ACE implementation is independently organized. See `THIRD_PARTY_QFUN_REFERENCE.md`.
 
-SSAID 之外的 Cleaner、设置注入、规则系统和 Compose UI 为本工程单独组织实现。
+## BeanShell
+
+ACE 0.2.5 uses the Maven dependency `org.apache-extras.beanshell:bsh:2.0b6` for manual Java-like
+script execution. BeanShell is an open-source scripting engine. Its upstream project currently
+publishes an Apache License 2.0 license.
+
+ACE 0.2.7 also uses QFun's public callback API/documentation as behavioral reference; ACE's hook discovery and event wrappers are independently implemented.

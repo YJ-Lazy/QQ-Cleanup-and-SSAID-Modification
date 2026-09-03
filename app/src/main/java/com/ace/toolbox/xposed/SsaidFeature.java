@@ -21,8 +21,6 @@ final class SsaidFeature {
     private static final Uri CONFIG_URI = Uri.parse("content://com.ace.toolbox.config/config");
 
     static void install(XposedModule module, Application app, ClassLoader loader) {
-        // Do not install another Settings.Secure hook at all unless the user explicitly enables
-        // SSAID. This lowers the chance of interacting with unrelated privacy/device-id modules.
         if (!HostConfig.ssaidEnabled(app)) {
             Log.i("ACE-SSAID", "SSAID disabled; hook not installed");
             return;
