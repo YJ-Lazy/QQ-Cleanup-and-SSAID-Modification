@@ -20,6 +20,11 @@ import com.ace.toolbox.ui.components.MiuiSection
 fun SettingsScreen(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val config = remember { AppConfig(context) }
+    val qqVersion = remember(context) {
+        runCatching {
+            context.packageManager.getPackageInfo("com.tencent.mobileqq", 0).versionName ?: "未知"
+        }.getOrElse { "未安装" }
+    }
 
     var clean by remember { mutableStateOf(config.cleanEnabled) }
     var compatibility by remember { mutableStateOf(config.compatibilityMode) }
@@ -131,6 +136,32 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
             )
         }
 
+        MiuiSection("QQ 兼容诊断") {
+            MiuiRow(
+                Icons.Rounded.PhoneAndroid,
+                "当前 QQ 版本",
+                qqVersion
+            )
+            HorizontalDivider(
+                Modifier.padding(start = 58.dp),
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = .45f)
+            )
+            MiuiRow(
+                Icons.Rounded.HealthAndSafety,
+                "只读兼容探测",
+                "QQ 启动后在 LSPosed 日志输出关键类存在性；不修改检测结果"
+            )
+            HorizontalDivider(
+                Modifier.padding(start = 58.dp),
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = .45f)
+            )
+            MiuiRow(
+                Icons.Rounded.Rule,
+                "9.3.50 参考适配",
+                "参考 QQEnhancedBypass 的公开兼容目标，用于定位版本变化与安全降级"
+            )
+        }
+
         MiuiSection("兼容规则") {
             MiuiRow(
                 Icons.Rounded.CloudDownload,
@@ -158,7 +189,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
             MiuiRow(
                 Icons.Rounded.Code,
                 "参考",
-                "FunBox：UI/交互；ssaid-qq：SSAID；QFun：QQ 清理路径与 Java 脚本架构思路"
+                "FunBox：UI/交互；ssaid-qq：SSAID；QFun：QQ 清理路径与脚本架构；QQEnhancedBypass：QQ 兼容诊断结构"
             )
         }
     }
