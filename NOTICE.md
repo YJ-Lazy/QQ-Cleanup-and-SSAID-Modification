@@ -20,6 +20,16 @@ https://github.com/oneQAQone/QFun
 The repository is distributed under GNU GPL v3. ACE does not copy QFun source files; the
 corresponding ACE implementation is independently organized. See `THIRD_PARTY_QFUN_REFERENCE.md`.
 
+## QQEnhancedBypass
+
+QQ compatibility research also references the public GPL-3.0 project:
+https://github.com/Xalsace/QQEnhancedBypass
+and the user-maintained mirror:
+https://github.com/YJ-Lazy/QQEnhancedBypass-
+
+ACE independently implements read-only compatibility diagnostics and does not copy or integrate
+the upstream security-evasion implementation. See `QQ_ENHANCED_REFERENCE.md`.
+
 ## BeanShell
 
 ACE 0.2.5 uses the Maven dependency `org.apache-extras.beanshell:bsh:2.0b6` for manual Java-like
