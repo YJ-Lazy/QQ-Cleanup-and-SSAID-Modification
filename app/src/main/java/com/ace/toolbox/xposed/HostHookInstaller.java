@@ -18,14 +18,13 @@ final class HostHookInstaller {
     private static final String TAG = "ACE-Hook";
     private static final Set<String> INSTALLED = Collections.synchronizedSet(new HashSet<>());
 
-
-static void installEarly(XposedModule module, String pkg) {
-    HostSettingInjector.setLogger(module);
-    installActivityFallback(module, pkg);
-    if (HostPackages.WECHAT.equals(pkg)) {
-        installWechatInstrumentationWatcher(module);
+    static void installEarly(XposedModule module, String pkg) {
+        HostSettingInjector.setLogger(module);
+        installActivityFallback(module, pkg);
+        if (HostPackages.WECHAT.equals(pkg)) {
+            installWechatInstrumentationWatcher(module);
+        }
     }
-}
 
     static void install(XposedModule module, XposedModule.PackageReadyParam param) {
         String pkg = param.getPackageName();
@@ -33,6 +32,7 @@ static void installEarly(XposedModule module, String pkg) {
         HostSettingInjector.setLogger(module);
 
         if (HostPackages.QQ.equals(pkg)) {
+            QqCompatibilityProbe.run(module, loader);
             QqSettingsProviderInjector.install(module, loader);
             QqScriptEventHookInstaller.install(module, loader);
         }
@@ -111,41 +111,40 @@ static void installEarly(XposedModule module, String pkg) {
         }
     }
 
+    private static void installWechatInstrumentationWatcher(XposedModule module) {
+        String key = HostPackages.WECHAT + ":instrumentation-resume";
+        if (!INSTALLED.add(key)) return;
 
-private static void installWechatInstrumentationWatcher(XposedModule module) {
-    String key = HostPackages.WECHAT + ":instrumentation-resume";
-    if (!INSTALLED.add(key)) return;
+        try {
+            Method resume = Instrumentation.class.getDeclaredMethod(
+                    "callActivityOnResume", Activity.class);
+            resume.setAccessible(true);
 
-    try {
-        Method resume = Instrumentation.class.getDeclaredMethod(
-                "callActivityOnResume", Activity.class);
-        resume.setAccessible(true);
-
-        module.hook(resume)
-                .setExceptionMode(XposedInterface.ExceptionMode.PROTECTIVE)
-                .intercept(chain -> {
-                    Object result = chain.proceed();
-                    Object arg = chain.getArg(0);
-                    if (arg instanceof Activity) {
-                        Activity activity = (Activity) arg;
-                        if (HostPackages.WECHAT.equals(activity.getPackageName())) {
-                            module.log(Log.INFO, TAG,
-                                    "WeChat Instrumentation resume: "
-                                            + activity.getClass().getName());
-                            HostSettingInjector.scheduleMaybeInject(
-                                    activity, HostPackages.WECHAT);
+            module.hook(resume)
+                    .setExceptionMode(XposedInterface.ExceptionMode.PROTECTIVE)
+                    .intercept(chain -> {
+                        Object result = chain.proceed();
+                        Object arg = chain.getArg(0);
+                        if (arg instanceof Activity) {
+                            Activity activity = (Activity) arg;
+                            if (HostPackages.WECHAT.equals(activity.getPackageName())) {
+                                module.log(Log.INFO, TAG,
+                                        "WeChat Instrumentation resume: "
+                                                + activity.getClass().getName());
+                                HostSettingInjector.scheduleMaybeInject(
+                                        activity, HostPackages.WECHAT);
+                            }
                         }
-                    }
-                    return result;
-                });
+                        return result;
+                    });
 
-        module.log(Log.INFO, TAG,
-                "Instrumentation.callActivityOnResume watcher installed for WeChat");
-    } catch (Throwable t) {
-        module.log(Log.ERROR, TAG,
-                "Instrumentation.callActivityOnResume watcher failed for WeChat", t);
+            module.log(Log.INFO, TAG,
+                    "Instrumentation.callActivityOnResume watcher installed for WeChat");
+        } catch (Throwable t) {
+            module.log(Log.ERROR, TAG,
+                    "Instrumentation.callActivityOnResume watcher failed for WeChat", t);
+        }
     }
-}
 
     private static void installActivityFallback(XposedModule module, String pkg) {
         String key = pkg + ":activity-resume";
